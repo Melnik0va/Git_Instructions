@@ -264,3 +264,8 @@ Changes not staged for commit:
           modified:   fileA.txt
 ```
 Файл попал и в `staged` (Changes to be committed), и в `modified` (Changes not staged for commit). В `staging area` находится версия файла с одним восклицательным знаком, а в `Changes not staged for commit` — уже изменённая версия, с тремя.
+
+## `git log` 
+
+- Можно вызвать не только полный лог, но и сокращённый — это делается командой `git log --oneline.`
+- В сокращённом логе выводятся сокращённые хеши — их можно использовать точно так же, как и полные.
