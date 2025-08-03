@@ -193,3 +193,74 @@ Date:   Tue Mar 28 00:26:53 2023 +0300
 ... # другие коммиты 
 ```
  Если нужно передать последний коммит, то вместо его хеша можно просто написать слово `HEAD` — Git поймёт, что вы имели в виду последний коммит.
+
+## Статусы файлов в Git 
+ **Основные статусы**: неотслеживаемый (`untracked`), подготовленный (`staged`), отслеживаемый (`tracked`), изменённый (`modified`)
+
+- `untracked` (англ. «неотслеживаемый»)
+
+Мы говорили, что новые файлы в Git-репозитории помечаются как untracked, то есть неотслеживаемые. Git «видит», что такой файл существует, но не следит за изменениями в нём. У untracked-файла нет предыдущих версий, зафиксированных в коммитах или через команду git add.
+
+- `staged` (англ. «подготовленный»)
+
+После выполнения команды `git add` файл попадает в `staging area` (от англ. stage — «сцена», «этап [процесса]» и area — «область»), то есть в список файлов, которые войдут в коммит. В этот момент файл находится в состоянии staged.
+
+- `tracked` (англ. «отслеживаемый»)
+
+Состояние `tracked` — это противоположность `untracked`. Оно довольно широкое по смыслу: в него попадают файлы, которые уже были зафиксированы с помощью git commit, а также файлы, которые были добавлены в staging area командой git add. То есть все файлы, в которых Git так или иначе отслеживает изменения.
+
+- `modified` (англ. «изменённый»)
+
+Состояние `modified` означает, что Git сравнил содержимое файла с последней сохранённой версией и нашёл отличия. Например, файл был закоммичен и после этого изменён.
+
+1. Нет ни staged-, ни modified-, ни untracked-файлов.
+
+```
+$ git status
+On branch master
+nothing to commit, working tree clean  
+```
+Это означает, что в репозитории нет новых или изменённых файлов. Последняя строка `nothing to commit, working tree clean` буквально переводится как «нечего коммитить, рабочая директория чиста».
+Первая строка `On branch master` сообщает, что текущая ветка — `master`.
+
+2. Найдены неотслеживаемые файлы.
+```
+$ touch fileA.txt
+$ git status
+On branch master
+Untracked files: # найдены неотслеживаемые файлы
+  (use "git add <file>..." to include in what will be committed)
+        fileA.txt
+
+nothing added to commit but untracked files present (use "git add" to track) 
+```
+Файл `fileA.txt` отображается в секции неотслеживаемых файлов — `Untracked files`. Это значит, что он не был добавлен в репозиторий через git add.
+3. Найдены изменения, которые не войдут в коммит
+Теперь откройте файл `fileA.txt` и добавьте в него несколько слов — например, `Это файл A!`
+```
+# внесли в fileA.txt правки
+# запросили статус
+$ git status 
+On branch master
+Changes not staged for commit: # ещё одна секция
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   fileA.txt
+```
+Файл `fileA.txt` был изменён, но ещё не добавлен в staging area после этого. Так он оказался в секции `Changes not staged for commit` (англ. «изменения, которые не подготовлены к коммиту»). Эта секция соответствует статусу `modified`.
+4. Файл добавлен в staging area, но после этого изменён
+Откройте текстовый редактор и добавьте нужные правки
+```
+# изменили fileA.txt
+$ git status
+On branch master
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+          modified:   fileA.txt
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+          modified:   fileA.txt
+```
+Файл попал и в `staged` (Changes to be committed), и в `modified` (Changes not staged for commit). В `staging area` находится версия файла с одним восклицательным знаком, а в `Changes not staged for commit` — уже изменённая версия, с тремя.
